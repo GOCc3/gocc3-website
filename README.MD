@@ -20,6 +20,6 @@ Every help is appreciated!
 
 
 Questions: mail@c3goc.de
-#\gocc3 @ hackint IRC
+\#gocc3 @ hackint IRC
 
 Maintained by: td00, VITAS, psy
