@@ -1,243 +1,260 @@
 /*
-	Astral by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+Astral by HTML5 UP
+html5up.net | @ajlkn
+Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
 (function($) {
 
-	var settings = {
+  var settings = {
 
-		// Speed to resize panel.
-			resizeSpeed: 600,
+    // Speed to resize panel.
+    resizeSpeed: 600,
 
-		// Speed to fade in/out.
-			fadeSpeed: 300,
+    // Speed to fade in/out.
+    fadeSpeed: 300,
 
-		// Size factor.
-			sizeFactor: 11.5,
+    // Size factor.
+    sizeFactor: 11.5,
 
-		// Minimum point size.
-			sizeMin: 15,
+    // Minimum point size.
+    sizeMin: 15,
 
-		// Maximum point size.
-			sizeMax: 20
+    // Maximum point size.
+    sizeMax: 20
 
-	};
+  };
 
-	var $window = $(window);
+  var $window = $(window);
 
-	$window.on('load', function() {
+  $window.on('load', function() {
 
-		skel
-			.breakpoints({
-				desktop: '(min-width: 737px)',
-				mobile: '(max-width: 736px)'
-			})
-			.viewport({
-				breakpoints: {
-					desktop: {
-						width: 1080,
-						scalable: false
-					}
-				}
-			})
-			.on('+desktop', function() {
+    var	$body = $('body');
+    var catImage = document.getElementById('catImage');
+    var catsArticle = document.getElementById('cats');
+    var catRefreshInterval;
+    catImage.onload = function() {
+      $body.trigger('resize');
+    };
+    function catReload() {
+      catImage.src = 'https://maurudor.de?' + Date.now();
+    }
 
-				var	$body = $('body'),
-					$main = $('#main'),
-					$panels = $main.find('.panel'),
-					$hbw = $('html,body,window'),
-					$footer = $('#footer'),
-					$wrapper = $('#wrapper'),
-					$nav = $('#nav'), $nav_links = $nav.find('a'),
-					$jumplinks = $('.jumplink'),
-					$form = $('form'),
-					panels = [],
-					activePanelId = null,
-					firstPanelId = null,
-					isLocked = false,
-					hash = window.location.hash.substring(1);
+    skel
+    .breakpoints({
+      desktop: '(min-width: 737px)',
+      mobile: '(max-width: 736px)'
+    })
+    .viewport({
+      breakpoints: {
+        desktop: {
+          width: 1080,
+          scalable: false
+        }
+      }
+    })
+    .on('+desktop', function() {
 
-				if (skel.vars.touch) {
+      var	$body = $('body'),
+      $main = $('#main'),
+      $panels = $main.find('.panel'),
+      $hbw = $('html,body,window'),
+      $footer = $('#footer'),
+      $wrapper = $('#wrapper'),
+      $nav = $('#nav'), $nav_links = $nav.find('a'),
+      $jumplinks = $('.jumplink'),
+      $form = $('form'),
+      panels = [],
+      activePanelId = null,
+      firstPanelId = null,
+      isLocked = false,
+      hash = window.location.hash.substring(1);
 
-					settings.fadeSpeed = 0;
-					settings.resizeSpeed = 0;
-					$nav_links.find('span').remove();
+      if (skel.vars.touch) {
 
-				}
+        settings.fadeSpeed = 0;
+        settings.resizeSpeed = 0;
+        $nav_links.find('span').remove();
 
-				// Body.
-					$body._resize = function() {
-						var factor = ($window.width() * $window.height()) / (1440 * 900);
-						$body.css('font-size', Math.min(Math.max(Math.floor(factor * settings.sizeFactor), settings.sizeMin), settings.sizeMax) + 'pt');
-						$main.height(panels[activePanelId].outerHeight());
-						$body._reposition();
-					};
+      }
 
-					$body._reposition = function() {
-						if (skel.vars.touch && (window.orientation == 0 || window.orientation == 180))
-							$wrapper.css('padding-top', Math.max((($window.height() - (panels[activePanelId].outerHeight() + $footer.outerHeight())) / 2) - $nav.height(), 30) + 'px');
-						else
-							$wrapper.css('padding-top', ((($window.height() - panels[firstPanelId].height()) / 2) - $nav.height()) + 'px');
-					};
+      // Body.
+      $body._resize = function() {
+        var factor = ($window.width() * $window.height()) / (1440 * 900);
+        $body.css('font-size', Math.min(Math.max(Math.floor(factor * settings.sizeFactor), settings.sizeMin), settings.sizeMax) + 'pt');
+        $main.height(panels[activePanelId].outerHeight());
+        $body._reposition();
+      };
 
-				// Panels.
-					$panels.each(function(i) {
-						var t = $(this), id = t.attr('id');
+      $body._reposition = function() {
+        if (skel.vars.touch && (window.orientation == 0 || window.orientation == 180))
+        $wrapper.css('padding-top', Math.max((($window.height() - (panels[activePanelId].outerHeight() + $footer.outerHeight())) / 2) - $nav.height(), 30) + 'px');
+        else
+        $wrapper.css('padding-top', ((($window.height() - panels[firstPanelId].height()) / 2) - $nav.height()) + 'px');
+      };
 
-						panels[id] = t;
+      // Panels.
+      $panels.each(function(i) {
+        var t = $(this), id = t.attr('id');
 
-						if (i == 0) {
+        panels[id] = t;
 
-							firstPanelId = id;
-							activePanelId = id;
+        if (i == 0) {
 
-						}
-						else
-							t.hide();
+          firstPanelId = id;
+          activePanelId = id;
 
-						t._activate = function(instant) {
+        }
+        else
+        t.hide();
 
-							// Check lock state and determine whether we're already at the target.
-								if (isLocked
-								||	activePanelId == id)
-									return false;
+        t._activate = function(instant) {
 
-							// Lock.
-								isLocked = true;
+          // Check lock state and determine whether we're already at the target.
+          if (isLocked
+            ||	activePanelId == id)
+            return false;
 
-							// Change nav link (if it exists).
-								$nav_links.removeClass('active');
-								$nav_links.filter('[href="#' + id + '"]').addClass('active');
+            // Lock.
+            isLocked = true;
 
-							// Change hash.
-								if (i == 0)
-									window.location.hash = '#';
-								else
-									window.location.hash = '#' + id;
+            // Change nav link (if it exists).
+            $nav_links.removeClass('active');
+            $nav_links.filter('[href="#' + id + '"]').addClass('active');
 
-							// Add bottom padding.
-								var x = parseInt($wrapper.css('padding-top')) +
-										panels[id].outerHeight() +
-										$nav.outerHeight() +
-										$footer.outerHeight();
+            // Change hash.
+            if (i == 0) {
+              window.location.hash = '#';
+            } else {
+              window.location.hash = '#' + id;
+              if (id === 'cats') {
+                catRefreshInterval = setInterval(catReload, 5000);
+              } else {
+                clearInterval(catReload);
+              }
+            }
 
-								if (x > $window.height())
-									$wrapper.addClass('tall');
-								else
-									$wrapper.removeClass('tall');
+            // Add bottom padding.
+            var x = parseInt($wrapper.css('padding-top')) +
+            panels[id].outerHeight() +
+            $nav.outerHeight() +
+            $footer.outerHeight();
 
-							// Fade out active panel.
-								$footer.fadeTo(settings.fadeSpeed, 0.0001);
-								panels[activePanelId].fadeOut(instant ? 0 : settings.fadeSpeed, function() {
+            if (x > $window.height())
+            $wrapper.addClass('tall');
+            else
+            $wrapper.removeClass('tall');
 
-									// Set new active.
-										activePanelId = id;
+            // Fade out active panel.
+            $footer.fadeTo(settings.fadeSpeed, 0.0001);
+            panels[activePanelId].fadeOut(instant ? 0 : settings.fadeSpeed, function() {
 
-										// Force scroll to top.
-											$hbw.animate({
-												scrollTop: 0
-											}, settings.resizeSpeed, 'swing');
+              // Set new active.
+              activePanelId = id;
 
-										// Reposition.
-											$body._reposition();
+              // Force scroll to top.
+              $hbw.animate({
+                scrollTop: 0
+              }, settings.resizeSpeed, 'swing');
 
-										// Resize main to height of new panel.
-											$main.animate({
-												height: panels[activePanelId].outerHeight()
-											}, instant ? 0 : settings.resizeSpeed, 'swing', function() {
+              // Reposition.
+              $body._reposition();
 
-												// Fade in new active panel.
-													$footer.fadeTo(instant ? 0 : settings.fadeSpeed, 1.0);
-													panels[activePanelId].fadeIn(instant ? 0 : settings.fadeSpeed, function() {
+              // Resize main to height of new panel.
+              $main.animate({
+                height: panels[activePanelId].outerHeight()
+              }, instant ? 0 : settings.resizeSpeed, 'swing', function() {
 
-														// Unlock.
-															isLocked = false;
+                // Fade in new active panel.
+                $footer.fadeTo(instant ? 0 : settings.fadeSpeed, 1.0);
+                panels[activePanelId].fadeIn(instant ? 0 : settings.fadeSpeed, function() {
 
-													});
-											});
+                  // Unlock.
+                  isLocked = false;
 
-								});
+                });
+              });
 
-						};
+            });
 
-					});
+          };
 
-				// Nav + Jumplinks.
-					$nav_links.add($jumplinks).click(function(e) {
-						var t = $(this), href = t.attr('href'), id;
+        });
 
-						if (href.substring(0,1) == '#') {
+        // Nav + Jumplinks.
+        $nav_links.add($jumplinks).click(function(e) {
+          var t = $(this), href = t.attr('href'), id;
 
-							e.preventDefault();
-							e.stopPropagation();
+          if (href.substring(0,1) == '#') {
 
-							id = href.substring(1);
+            e.preventDefault();
+            e.stopPropagation();
 
-							if (id in panels)
-								panels[id]._activate();
+            id = href.substring(1);
 
-						}
+            if (id in panels)
+            panels[id]._activate();
 
-					});
+          }
 
-				// Window.
-					$window
-						.resize(function() {
+        });
 
-							if (!isLocked)
-								$body._resize();
+        // Window.
+        $window
+        .resize(function() {
 
-						});
+          if (!isLocked)
+          $body._resize();
 
-					$window
-						.on('orientationchange', function() {
+        });
 
-							if (!isLocked)
-								$body._reposition();
+        $window
+        .on('orientationchange', function() {
 
-						});
+          if (!isLocked)
+          $body._reposition();
 
-					if (skel.vars.IEVersion < 9)
-						$window
-							.on('resize', function() {
-								$wrapper.css('min-height', $window.height());
-							});
+        });
 
-				// Fix: Placeholder polyfill.
-					$('form').placeholder();
+        if (skel.vars.IEVersion < 9)
+        $window
+        .on('resize', function() {
+          $wrapper.css('min-height', $window.height());
+        });
 
-				// Prioritize "important" elements on mobile.
-					skel.on('+mobile -mobile', function() {
-						$.prioritize(
-							'.important\\28 mobile\\29',
-							skel.breakpoint('mobile').active
-						);
-					});
+        // Fix: Placeholder polyfill.
+        $('form').placeholder();
 
-				// CSS polyfills (IE<9).
-					if (skel.vars.IEVersion < 9)
-						$(':last-child').addClass('last-child');
+        // Prioritize "important" elements on mobile.
+        skel.on('+mobile -mobile', function() {
+          $.prioritize(
+            '.important\\28 mobile\\29',
+            skel.breakpoint('mobile').active
+          );
+        });
 
-				// Init.
-					$window
-						.trigger('resize');
+        // CSS polyfills (IE<9).
+        if (skel.vars.IEVersion < 9)
+        $(':last-child').addClass('last-child');
 
-					if (hash && hash in panels)
-						panels[hash]._activate(true);
+        // Init.
+        $window
+        .trigger('resize');
 
-					$wrapper.fadeTo(400, 1.0);
+        if (hash && hash in panels)
+        panels[hash]._activate(true);
 
-			})
-			.on('-desktop', function() {
+        $wrapper.fadeTo(400, 1.0);
 
-				window.setTimeout(function() {
-					location.reload(true);
-				}, 50);
+      })
+      .on('-desktop', function() {
 
-			});
+        window.setTimeout(function() {
+          location.reload(true);
+        }, 50);
 
-	});
+      });
 
-})(jQuery);
+    });
+
+  })(jQuery);
